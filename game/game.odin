@@ -3,29 +3,39 @@ package game
 import rl "vendor:raylib"
 
 main :: proc() {
-    rl.InitWindow(1280, 720, "My First Game")
+    window_width  := i32(1280)
+    window_height := i32(720)
+
+    rl.InitWindow(window_width, window_height, "My First Game")
     player_pos := rl.Vector2 { 640, 320 }
     player_vel: rl.Vector2
     player_grounded: bool
-    // new line
+
     player_flip: bool
-    player_run_texture := rl.LoadTexture("../assets/cat_run.png")
+    player_run_texture := rl.LoadTexture("../assets/rogue.png")
     player_run_num_frames := 4
     player_run_frame_timer: f32
     player_run_current_frame: int
     player_run_frame_length := f32(0.1)
     
+    map_texture := rl.LoadTexture("../assets/untitled.png")
+    source_rec  := rl.Rectangle{0, 0, f32(map_texture.width), f32(map_texture.height)}
+    dest_rec    := rl.Rectangle{0, 0, f32(window_width), f32(window_height)}
+    origin      := rl.Vector2{0, 0}
+    
     for !rl.WindowShouldClose() {
+        if rl.GetScreenWidth() != window_width || rl.GetScreenHeight() != window_height {
+            rl.SetWindowSize(window_width, window_height) 
+        }        
+
         rl.BeginDrawing()
         rl.ClearBackground({110, 184, 168, 255})
 
         if rl.IsKeyDown(.LEFT) {
             player_vel.x = -400
-            // new line
             player_flip = true
         } else if rl.IsKeyDown(.RIGHT) {
             player_vel.x = 400
-            // new line
             player_flip = false
         } else {
             player_vel.x = 0
@@ -75,7 +85,9 @@ main :: proc() {
             height = player_run_height * 4
         }
 
+        rl.DrawTexturePro(map_texture, source_rec, dest_rec, origin, 0, rl.WHITE)
         rl.DrawTexturePro(player_run_texture, draw_player_source, draw_player_dest, 0, 0, rl.WHITE)
+        
         rl.EndDrawing()
     }
 

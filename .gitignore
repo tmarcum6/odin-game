@@ -1,2 +1,6 @@
 ols.json
-.exe
+
+*.dll
+*.exe
+
+build/
