@@ -19,6 +19,7 @@ main :: proc() {
         dest = rl.Rectangle{0, 0, f32(window_width), f32(window_height)},
         origin = rl.Vector2{0, 0}
     }
+    defer rl.UnloadTexture(map_texture)
 
     player_texture  := rl.LoadTexture("../assets/rogue.png")
     player := e.entity {
@@ -27,21 +28,27 @@ main :: proc() {
         vel = 0,
         run_num_frames = 1,
     }
+    defer rl.UnloadTexture(player_texture)
 
     for !rl.WindowShouldClose() {
         if rl.GetScreenWidth() != window_width || rl.GetScreenHeight() != window_height {
             rl.SetWindowSize(window_width, window_height) 
         }        
 
+        player_run_width := f32(player_texture.width)
+        player_run_height := f32(player_texture.height)
+        e.camera.target = rl.Vector2{player.pos.x + player_run_width / 2, player.pos.y + player_run_height / 2}
+        e.camera.offset = rl.Vector2{f32(window_width) / 2, f32(window_height) / 2}
+        e.camera_zoom()
+
         rl.BeginDrawing()
         rl.ClearBackground({110, 184, 168, 255})
+        
+        rl.BeginMode2D(e.camera)
 
         e.handle_input(&player)
 
         player.pos += player.vel * rl.GetFrameTime()
-
-        player_run_width := f32(player_texture.width)
-        player_run_height := f32(player_texture.height)
 
         player_run_frame_timer += rl.GetFrameTime()
 
@@ -58,14 +65,16 @@ main :: proc() {
             width = player_run_width * 4 / f32(player.run_num_frames),
             height = player_run_height * 4
         }
-        
-        // if player_pos.x >= f32(window_width) || player_pos.y >= f32(window_height) {
-        //     player_vel = 0
-        // }   
-
+    
+        e.lock_player_to_window(&player, player_run_width, player_run_height, f32(window_width), f32(window_height))
+     
         rl.DrawTexturePro(map_texture, smap.source, smap.dest, smap.origin, 0, rl.WHITE)
         rl.DrawTexturePro(player_texture, draw_player_source, draw_player_dest, 0, 0, rl.WHITE)
-        
+
+        rl.EndMode2D()
+
+        rl.DrawText("Move: Arrow Keys | Zoom: W/S", 10, 10, 20, rl.BLACK)
+
         rl.EndDrawing()
     }
 
