@@ -1,5 +1,6 @@
 ols.json
 
+*.txt
 *.dll
 *.exe
 
