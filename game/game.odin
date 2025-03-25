@@ -3,8 +3,12 @@ package game
 import rl "vendor:raylib"
 import "core:math/rand"
 import e "../engine" 
+import "core:fmt"
+import "core:strconv"
 
 main :: proc() {
+
+// init
     window_width  := i32(1280)
     window_height := i32(720)
     rl.InitWindow(window_width, window_height, "My First Game")
@@ -13,7 +17,7 @@ main :: proc() {
     player_run_current_frame : int
     player_run_frame_length  := f32(0.1)
     
-    map_texture := rl.LoadTexture("../assets/untitled.png")
+    map_texture := rl.LoadTexture("../assets/testmapexport.png")
     smap := e.s_map {
         source = rl.Rectangle{0, 0, f32(map_texture.width), f32(map_texture.height)},
         dest = rl.Rectangle{0, 0, f32(window_width), f32(window_height)},
@@ -30,7 +34,13 @@ main :: proc() {
     }
     defer rl.UnloadTexture(player_texture)
 
+    tmap := e.load_tiled_map("../assets/testmapexport.json")
+    fmt.println("Loaded tilemap with dimensions:", tmap.width, "x", tmap.height)
+
+// main game loop
     for !rl.WindowShouldClose() {
+
+// update
         if rl.GetScreenWidth() != window_width || rl.GetScreenHeight() != window_height {
             rl.SetWindowSize(window_width, window_height) 
         }        
@@ -41,6 +51,13 @@ main :: proc() {
         e.camera.offset = rl.Vector2{f32(window_width) / 2, f32(window_height) / 2}
         e.camera_zoom()
 
+        // check for key press
+        buf: [20]u8 
+        i := int(e.get_tile_at_position(tmap, player.pos.x, player.pos.y))
+        result: string = strconv.itoa(buf[:], i)
+        fmt.println("TileId:", result)
+
+// draw
         rl.BeginDrawing()
         rl.ClearBackground({110, 184, 168, 255})
         
@@ -74,9 +91,11 @@ main :: proc() {
         rl.EndMode2D()
 
         rl.DrawText("Move: Arrow Keys | Zoom: W/S", 10, 10, 20, rl.BLACK)
+        rl.DrawText("Tile: ", 900, 10, 20, rl.BLACK)
 
         rl.EndDrawing()
     }
 
+// close
     rl.CloseWindow()
 }

@@ -1,7 +1,9 @@
 ols.json
+launch.json
 
 *.txt
 *.dll
 *.exe
+*.pdb
 
 build/
