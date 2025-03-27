@@ -12,7 +12,6 @@ main :: proc() {
     for !raylib.WindowShouldClose() {
         dt := raylib.GetFrameTime()
 
-        // Move player
         if raylib.IsKeyDown(.RIGHT) {
             player_pos.x += f32(player_speed) * dt
         }
@@ -26,23 +25,27 @@ main :: proc() {
             player_pos.y -= f32(player_speed) * dt
         }
 
-        // Define collision rectangles based on entity positions
         player_rect := raylib.Rectangle{player_pos.x, player_pos.y, 50, 50}
-        enemy_rect  := raylib.Rectangle{enemy_pos.x, enemy_pos.y, 50, 50} // Assuming a 50x50 enemy
+        enemy_rect  := raylib.Rectangle{enemy_pos.x, enemy_pos.y, 50, 50}
 
+        // prev_pos := player_pos  // Store last position
+        // player_pos += f32(player_speed) * raylib.GetFrameTime()
+
+        // collided := false
+        // if raylib.CheckCollisionRecs(player_rect, enemy_rect) {
+        //     collided = true
+        //     player_pos = prev_pos // Revert to prevent overlap
+        // }
         collided := raylib.CheckCollisionRecs(player_rect, enemy_rect)
 
         raylib.BeginDrawing()
         raylib.ClearBackground(raylib.RAYWHITE)
 
-        // Draw player sprite
         //raylib.DrawTexture(texture, i32(player_pos.x), i32(player_pos.y), raylib.GREEN)
         raylib.DrawRectangleRec(player_rect, raylib.GREEN)
 
-        // Draw enemy (using a rectangle for simplicity)
         raylib.DrawRectangleRec(enemy_rect, raylib.DARKGRAY)
 
-        // Draw collision indicator
         if collided {
             raylib.DrawText("Collision!", 350, 50, 20, raylib.RED)
         }
